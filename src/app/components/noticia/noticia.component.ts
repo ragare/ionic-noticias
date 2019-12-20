@@ -5,6 +5,7 @@ import { ActionSheetController } from '@ionic/angular';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { DataLocalService } from '../../services/data-local.service';
 
+
 @Component({
   selector: 'app-noticia',
   templateUrl: './noticia.component.html',
@@ -14,6 +15,7 @@ export class NoticiaComponent implements OnInit {
 
   @Input() noticia: Article;
   @Input() i: number;
+  @Input() enFavoritos = false;
 
   constructor(
     private iab: InAppBrowser,
@@ -42,11 +44,15 @@ export class NoticiaComponent implements OnInit {
           );
         }
       }, {
-        text: 'Favorito',
-        icon: 'star',
+        text: this.enFavoritos ? 'Borrar de favoritos' : 'Favoritos',
+        icon: this.enFavoritos ? 'trash' : 'star',
         cssClass: 'action-dark',
         handler: () => {
-          this.dataLocalService.guardarNoticia(this.noticia);
+          if (this.enFavoritos) {
+            this.dataLocalService.borrarNoticia(this.noticia);
+          } else {
+            this.dataLocalService.guardarNoticia(this.noticia);
+          }
         }
       }, {
         text: 'Cancelar',
@@ -54,7 +60,6 @@ export class NoticiaComponent implements OnInit {
         cssClass: 'action-dark',
         role: 'cancel',
         handler: () => {
-          console.log('Cancel clicked');
         }
       }]
     });

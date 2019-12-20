@@ -11,10 +11,15 @@ export class Tab3Page implements OnInit {
 
   noticias: Article[] = [];
 
-  constructor(private dataLocal: DataLocalService) {}
+  sliderOpts = {
+    allowSlidePrev: false,
+    allowSlideNext: false
+  };
+
+  constructor(public dataLocalService: DataLocalService) {}
 
   ngOnInit() {
-
   }
+
 
 }
