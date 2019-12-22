@@ -1,10 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Article } from '../../interfaces/interfaces';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
-import { ActionSheetController } from '@ionic/angular';
+import { ActionSheetController, Platform } from '@ionic/angular';
 import { SocialSharing } from '@ionic-native/social-sharing/ngx';
 import { DataLocalService } from '../../services/data-local.service';
-
 
 @Component({
   selector: 'app-noticia',
@@ -21,9 +20,10 @@ export class NoticiaComponent implements OnInit {
     private iab: InAppBrowser,
     private actionSheetCtrl: ActionSheetController,
     private socialSharing: SocialSharing,
-    private dataLocalService: DataLocalService) { }
+    private dataLocalService: DataLocalService,
+    private platform: Platform) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   abrirNoticia() {
     const browser = this.iab.create(this.noticia.url, '_system');
@@ -36,12 +36,7 @@ export class NoticiaComponent implements OnInit {
         icon: 'share',
         cssClass: 'action-dark',
         handler: () => {
-          this.socialSharing.share(
-            this.noticia.title,
-            this.noticia.source.name,
-            '',
-            this.noticia.url
-          );
+          this.compartirNoticias();
         }
       }, {
         text: this.enFavoritos ? 'Borrar de favoritos' : 'Favoritos',
@@ -64,5 +59,28 @@ export class NoticiaComponent implements OnInit {
       }]
     });
     await actionSheet.present();
+  }
+
+  compartirNoticias() {
+    if (this.platform.is('cordova')) {
+      this.socialSharing.share(
+        this.noticia.title,
+        this.noticia.source.name,
+        '',
+        this.noticia.url
+      );
+    } else {
+      if (navigator['share']) {
+        navigator['share']({
+          title: this.noticia.title,
+          text: this.noticia.decription,
+          url: this.noticia.url,
+        })
+          .then(() => console.log('Successful share'))
+          .catch((error) => console.log('Error sharing', error));
+      } else {
+        console.log('NO soporta esl share');
+      }
+    }
   }
 }
